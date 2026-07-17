@@ -1,41 +1,31 @@
 ---
-name: Unit Tests
-
-permissions:
-  contents: read
-  pull-requests: read
-
+name: Vendor Dependencies Check
 on:
   pull_request:
     types: ['opened', 'synchronize']
     paths:
-      - '.github/workflows/unit-test.yaml'
-      - 'vendor/**'
-      - '**.go'
-
-concurrency:
-  group: 'unit-${{ github.head_ref }}'
-  cancel-in-progress: true
+      - 'depscheck.yaml'
+      - '../../vendor'
+      - '../../main.go'
 
 jobs:
-  test:
-    runs-on: custom-linux-large
+  depscheck:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version-file: ./.go-version
+          go-version-file: .go-version
       - run: bash scripts/gogetcookie.sh
-      - run: make test
-        env:
-          GITHUB_ACTIONS_STAGE: "UNIT_TESTS"
+      - run: make tools
+      - run: make depscheck
 
   save-artifacts-on-fail:
-    needs: [ test ]
+    needs: [ depscheck ]
     if: ${{ failure() }}
     uses: ./.github/workflows/save-artifacts.yaml
 
   comment-on-fail:
-    needs: [ test ]
+    needs: [ depscheck ]
     if: ${{ failure() }}
     uses: ./.github/workflows/comment-failure.yaml

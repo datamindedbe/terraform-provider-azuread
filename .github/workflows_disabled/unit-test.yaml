@@ -1,22 +1,24 @@
 ---
-name: Generation Check
+name: Unit Tests
 
 permissions:
   contents: read
+  pull-requests: read
 
 on:
   pull_request:
     types: ['opened', 'synchronize']
     paths:
-      - '.github/workflows/gencheck.yaml'
-      - '**.go'
+      - 'unit-test.yaml'
+      - '../../vendor'
+      - '../../main.go'
 
 concurrency:
-  group: 'gencheck-${{ github.head_ref }}'
+  group: 'unit-${{ github.head_ref }}'
   cancel-in-progress: true
 
 jobs:
-  gencheck:
+  test:
     runs-on: custom-linux-large
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
@@ -24,14 +26,16 @@ jobs:
         with:
           go-version-file: ./.go-version
       - run: bash scripts/gogetcookie.sh
-      - run: make gencheck
+      - run: make test
+        env:
+          GITHUB_ACTIONS_STAGE: "UNIT_TESTS"
 
   save-artifacts-on-fail:
-    needs: [ gencheck ]
+    needs: [ test ]
     if: ${{ failure() }}
     uses: ./.github/workflows/save-artifacts.yaml
 
   comment-on-fail:
-    needs: [ gencheck ]
+    needs: [ test ]
     if: ${{ failure() }}
     uses: ./.github/workflows/comment-failure.yaml

@@ -4,11 +4,11 @@ on:
   pull_request:
     types: ["opened", "synchronize"]
     paths:
-      - '.github/workflows/provider-test.yaml'
-      - 'go.mod'
-      - 'internal/provider/*.go'
-      - 'vendor/github.com/hashicorp/go-azure-sdk/sdk/auth/**'
-      - 'vendor/github.com/hashicorp/go-azure-sdk/sdk/environments/**'
+      - 'provider-test.yaml'
+      - '../../go.mod'
+      - '../../internal/provider/helpers.go'
+      - '../../vendor/github.com/hashicorp/go-azure-sdk/sdk/auth'
+      - '../../vendor/github.com/hashicorp/go-azure-sdk/sdk/environments'
 
 permissions:
   contents: read

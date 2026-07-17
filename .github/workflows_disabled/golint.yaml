@@ -4,9 +4,9 @@ on:
   pull_request:
     types: ['opened', 'synchronize']
     paths:
-      - '.github/workflows/golint.yaml'
-      - 'vendor/**'
-      - '**.go'
+      - 'golint.yaml'
+      - '../../vendor'
+      - '../../main.go'
 
 jobs:
   golint:
